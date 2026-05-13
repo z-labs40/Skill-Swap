@@ -164,14 +164,9 @@ export function CallProvider({ children }: { children: React.ReactNode }) {
       if (auth.id && (currentCallState as any) !== 'none') {
         const typeLabel = (currentCallState as string).charAt(0).toUpperCase() + (currentCallState as string).slice(1);
 
-        // Accurate identification of the person who INITIATED the call
-        // If we are the receiver (incomingCall exists), the initiator is the person who called us.
-        // If we are the caller (incomingCall is null), the initiator is US (auth.name).
-        const initiatorName = currentIncomingCall ? (currentIncomingCall.name || 'User') : (auth.name || 'Caller');
-
-        const historyMsg = duration
-          ? `${typeLabel} Call from ${initiatorName} Ended`
-          : `Missed ${typeLabel} Call from ${initiatorName}`;
+        const initiatorId = currentIncomingCall ? currentIncomingCall.from : auth.id;
+        const statusLabel = duration ? 'Ended' : 'Missed';
+        const historyMsg = `${initiatorId}|${typeLabel}|${statusLabel}`;
 
         console.log('Saving call history message:', historyMsg);
 

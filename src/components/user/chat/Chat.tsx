@@ -104,11 +104,12 @@ const ADMIN_SUPPORT_SWAPPER = {
   id: 'admin-support',
   name: 'SkillBridge Support',
   avatar: '🛡️',
-  avatarUrl: '/logo.png', // Using logo for admin
+  avatarUrl: '/logo.png',
   isOnline: true,
   offers: ['Platform Support'],
   seeks: ['Feedback'],
-  rating: 5.0
+  rating: 5.0,
+  isOfficial: true
 };
 
 
@@ -129,7 +130,7 @@ export function Chat() {
   // Sync swapper from allSwappers or fetch if missing
   useEffect(() => {
     if (otherId === 'admin-support') {
-      setSwapper(ADMIN_SUPPORT_SWAPPER);
+      setSwapper({ ...ADMIN_SUPPORT_SWAPPER, isOnline: true });
     } else if (otherId) {
       const found = allSwappers.find(s => s.id === otherId);
       if (found) {
@@ -263,23 +264,45 @@ export function Chat() {
   }, [currentUser?.id]);
 
   const fetchMessages = async () => {
-    if (!currentUser.id || !otherId || isAdminChat) return;
+    if (!currentUser.id || !otherId) return;
     try {
       const data = await chatService.getMessages(currentUser.id, otherId);
-      const mappedMessages = data.map(m => ({
-        id: m.id,
-        text: m.message,
-        sender: m.sender_id === currentUser.id ? 'me' : 'them',
-        time: new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        isFile: m.type === 'file',
-        isVoice: m.type === 'voice',
-        isSystem: m.type === 'call',
-        callType: m.message.toLowerCase().includes('video') ? 'video' : m.message.toLowerCase().includes('voice') ? 'voice' : 'screen',
-        callStatus: m.message.toLowerCase().includes('ended') ? 'ended' : 'missed',
-        duration: m.file_url, // We stored duration in fileUrl
-        fileUrl: m.type === 'file' || m.type === 'voice' ? m.file_url : undefined,
-        isEdited: m.is_edited
-      }));
+      const mappedMessages = data.map(m => {
+        let text = m.message;
+        let callType = 'voice';
+        let callStatus = 'ended';
+        
+        if (m.type === 'call') {
+          const parts = m.message.split('|');
+          if (parts.length >= 3) {
+            const initiatorId = parts[0];
+            callType = parts[1].toLowerCase();
+            callStatus = parts[2].toLowerCase();
+            const isMeInitiator = initiatorId === currentUser.id;
+            
+            if (callStatus === 'ended') {
+              text = isMeInitiator ? `Outgoing ${parts[1]} Call` : `Incoming ${parts[1]} Call`;
+            } else {
+              text = isMeInitiator ? `Cancelled ${parts[1]} Call` : `Missed ${parts[1]} Call`;
+            }
+          }
+        }
+
+        return {
+          id: m.id,
+          text: text,
+          sender: m.sender_id === currentUser.id ? 'me' : 'them',
+          time: new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          isFile: m.type === 'file',
+          isVoice: m.type === 'voice',
+          isSystem: m.type === 'call',
+          callType,
+          callStatus,
+          duration: m.file_url,
+          fileUrl: m.type === 'file' || m.type === 'voice' ? m.file_url : undefined,
+          isEdited: m.is_edited
+        };
+      });
       setMessages(mappedMessages);
     } catch (error) {
       console.error('Failed to fetch messages:', error);
@@ -306,7 +329,9 @@ export function Chat() {
 
       if (isAdminChat) {
         loadAdminMessages();
+        const interval = setInterval(loadAdminMessages, 5000); // Poll for admin replies every 5s
         setLoading(false);
+        return () => clearInterval(interval);
       } else {
         fetchMessages();
         const interval = setInterval(fetchMessages, 10000); // Polling as fallback (10s)
@@ -324,25 +349,40 @@ export function Chat() {
     } else {
       setLoading(false);
     }
-  }, [otherId, currentUser.id, isAdminChat]);
+  }, [otherId, currentUser.id, currentUser.email, isAdminChat]);
 
   const [newMessage, setNewMessage] = useState("");
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const loadAdminMessages = async () => {
     if (isAdminChat) {
-      const userEmail = localStorage.getItem("userEmail") || "";
+      const userEmail = currentUser.email || localStorage.getItem("userEmail") || "";
+
       try {
         const allMessages = await getSupportMessages();
+        console.log('Support Chat: Data Received:', allMessages?.length);
         const messagesArray = allMessages || [];
-        const adminMsgs = messagesArray.filter((m: any) => m.userEmail === userEmail);
-        const formatted = adminMsgs.flatMap((m: any) => {
-          const msgs = [{ id: m.id + '_u', text: m.message, sender: 'me', time: new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }];
-          if (m.reply) {
-            msgs.push({ id: m.id + '_a', text: m.reply, sender: 'them', time: new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) } as any);
-          }
-          return msgs;
+        
+        const adminMsgs = messagesArray.filter((m: any) => {
+          const dbEmail = (m.user_email || "").toLowerCase().trim();
+          const targetEmail = userEmail.toLowerCase().trim();
+          const match = dbEmail === targetEmail;
+          return match;
         });
+        
+        console.log('Support Chat: Filtered messages for user:', adminMsgs.length);
+
+        const sorted = adminMsgs.sort((a: any, b: any) => 
+          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+        );
+
+        const formatted = sorted.map((m: any) => ({
+          id: m.id,
+          text: m.message,
+          sender: (m.status === 'replied' || m.id.toString().startsWith('reply_') || m.id.toString().startsWith('ai_')) ? 'them' : 'me',
+          time: new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        }));
+        
         setMessages(formatted);
       } catch (error) {
         console.error('Failed to load support messages:', error);
@@ -495,13 +535,19 @@ export function Chat() {
     if (!newMessage.trim() || !currentUser.id) return;
 
     if (isAdminChat) {
-      const userEmail = localStorage.getItem("userEmail") || "";
+      const userEmail = currentUser.email || localStorage.getItem("userEmail") || "";
+      if (!userEmail) {
+        showToast("Please log in to contact support", "error");
+        return;
+      }
       try {
         await sendSupportMessage(userEmail, newMessage);
         setNewMessage("");
-        loadAdminMessages();
+        // Optimistically reload messages
+        setTimeout(loadAdminMessages, 500); 
       } catch (error) {
         console.error('Failed to send support message:', error);
+        showToast("Failed to send message", "error");
       }
     } else if (otherId) {
       try {
@@ -710,10 +756,12 @@ export function Chat() {
                   <AvatarIcon name={swapper.name} url={swapper.avatarUrl} className="w-full h-full" />
                 </motion.div>
                 <div className="min-w-0">
-                  <h2 className="text-white font-bold text-base sm:text-lg leading-tight truncate">{swapper.name}</h2>
-                  <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-gray-400">
-                    <span className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${onlineUserIds.has(swapper.id) ? 'bg-green-500' : 'bg-gray-500'}`}></span>
-                    {onlineUserIds.has(swapper.id) ? 'Online' : 'Offline'}
+                  <h1 className="text-white font-black text-sm sm:text-base truncate leading-tight">{swapper?.name}</h1>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <div className={`w-1.5 h-1.5 rounded-full ${isAdminChat || swapper?.isOnline ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]' : 'bg-gray-500'}`} />
+                    <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">
+                      {isAdminChat || swapper?.isOnline ? 'Online' : 'Offline'}
+                    </span>
                   </div>
                 </div>
               </div>
