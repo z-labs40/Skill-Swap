@@ -73,6 +73,7 @@ export function CallProvider({ children }: { children: React.ReactNode }) {
         }
       };
 
+      console.log('CallContext: Registering call_incoming listener for user:', auth.id);
       socketService.on('call_incoming', handleIncomingCall);
 
       return () => {

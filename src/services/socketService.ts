@@ -21,7 +21,6 @@ class SocketService {
     console.log('Initiating socket connection for:', userId);
     this.currentUserId = userId;
     this.socket = io(SOCKET_URL, {
-      transports: ['websocket'],
       path: '/socket.io/',
       secure: true,
       reconnection: true,

@@ -8,6 +8,7 @@ export function useAuth() {
     const result = await loginUser(email, password)
     if (result.success) {
       setAuth(getAuthState())
+      window.dispatchEvent(new Event('storage'))
     }
     return result
   }, [])
