@@ -63,9 +63,9 @@ export async function sendForgotPasswordOtp(email: string): Promise<{ success: b
   }
 }
 
-export async function verifyForgotPasswordOtp(email: string, otp: string): Promise<{ success: boolean; error?: string }> {
+export async function verifyForgotPasswordOtp(email: string, otp: string, newPassword: string): Promise<{ success: boolean; error?: string }> {
   try {
-    const response = await api.post('/auth/forgot-password/verify-otp', { email, otp });
+    const response = await api.post('/auth/forgot-password/verify-otp', { email, otp, newPassword });
     return { success: response.data.success };
   } catch (error: any) {
     return { success: false, error: error.error || error.message || 'Failed to verify OTP' };

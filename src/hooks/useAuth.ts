@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react"
-import { getAuthState, loginUser, signupUser, verifySignupOtp, logoutUser, AuthState } from "../lib/auth"
+import { getAuthState, loginUser, signupUser, verifySignupOtp, logoutUser, AuthState, sendForgotPasswordOtp, verifyForgotPasswordOtp } from "../lib/auth"
 
 export function useAuth() {
   const [auth, setAuth] = useState<AuthState>(getAuthState)
@@ -22,6 +22,14 @@ export function useAuth() {
     return result
   }, [])
 
+  const sendForgotPassword = useCallback(async (email: string) => {
+    return await sendForgotPasswordOtp(email)
+  }, [])
+
+  const resetPassword = useCallback(async (email: string, otp: string, newPassword: string) => {
+    return await verifyForgotPasswordOtp(email, otp, newPassword)
+  }, [])
+
   const logout = useCallback(() => {
     logoutUser()
     setAuth(getAuthState())
@@ -34,7 +42,7 @@ export function useAuth() {
     return () => window.removeEventListener('storage', syncAuth);
   }, []);
 
-  return { auth, login, signup, verifySignup, logout }
+  return { auth, login, signup, verifySignup, sendForgotPassword, resetPassword, logout }
 }
 
 

@@ -48,7 +48,7 @@ export function LoginCard({ onSuccess, defaultTab = "login" }: LoginCardProps) {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  const { login, signup, verifySignup } = useAuth()
+  const { login, signup, verifySignup, sendForgotPassword, resetPassword } = useAuth()
   const { showToast } = useToast()
   const navigate = useNavigate()
 
@@ -124,19 +124,22 @@ export function LoginCard({ onSuccess, defaultTab = "login" }: LoginCardProps) {
 
   }
 
-  const handleForgot = () => {
+  const handleForgot = async () => {
     if (forgotStep === 1) {
       if (!email) {
         setError("Please enter your email.")
         return
       }
-      // Simulate sending OTP
       setLoading(true)
-      setTimeout(() => {
-        setLoading(false)
+      const res = await sendForgotPassword(email)
+      setLoading(false)
+      if (res.success) {
         setForgotStep(2)
         setError(null)
-      }, 1500)
+        showToast("OTP sent to your email!", "success")
+      } else {
+        setError(res.error || "Failed to send OTP")
+      }
     } else {
       if (!otp || !password || !confirm) {
         setError("Please fill in all fields.")
@@ -146,19 +149,21 @@ export function LoginCard({ onSuccess, defaultTab = "login" }: LoginCardProps) {
         setError("Passwords do not match.")
         return
       }
-      if (otp !== "123456") { // Mock OTP check
-        setError("Invalid OTP. Try 123456")
-        return
-      }
-      // Simulate reset
+      
       setLoading(true)
-      setTimeout(() => {
-        setLoading(false)
+      const res = await resetPassword(email, otp, password)
+      setLoading(false)
+      if (res.success) {
         setTab("login")
         setForgotStep(1)
         setError(null)
+        setOtp("")
+        setPassword("")
+        setConfirm("")
         showToast("Password reset successfully! Please login.", "success")
-      }, 2000)
+      } else {
+        setError(res.error || "Failed to reset password")
+      }
     }
   }
 

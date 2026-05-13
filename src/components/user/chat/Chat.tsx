@@ -694,12 +694,12 @@ export function Chat() {
         <div className="h-16 sm:h-20 border-b border-white/10 bg-white/5 flex items-center px-4 sm:px-6 justify-between shrink-0 z-10">
           {otherId && swapper ? (
             <>
-              <div className="flex items-center gap-3 sm:gap-4">
+              <div className="flex items-center gap-2 sm:gap-4 overflow-hidden">
                 <button
                   onClick={() => setShowMobileSidebar(true)}
-                  className="md:hidden p-2 -ml-2 text-gray-400 hover:text-white"
+                  className="md:hidden p-1.5 -ml-1 text-gray-400 hover:text-white"
                 >
-                  <ChevronLeft size={24} />
+                  <ChevronLeft size={20} />
                 </button>
                 <motion.div
                   initial={{ scale: 0.8, opacity: 0 }}
@@ -709,35 +709,35 @@ export function Chat() {
                 >
                   <AvatarIcon name={swapper.name} url={swapper.avatarUrl} className="w-full h-full" />
                 </motion.div>
-                <div>
-                  <h2 className="text-white font-bold text-lg leading-tight">{swapper.name}</h2>
-                  <div className="flex items-center gap-2 text-xs text-gray-400">
-                    <span className={`w-2 h-2 rounded-full ${onlineUserIds.has(swapper.id) ? 'bg-green-500' : 'bg-gray-500'}`}></span>
+                <div className="min-w-0">
+                  <h2 className="text-white font-bold text-base sm:text-lg leading-tight truncate">{swapper.name}</h2>
+                  <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-gray-400">
+                    <span className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${onlineUserIds.has(swapper.id) ? 'bg-green-500' : 'bg-gray-500'}`}></span>
                     {onlineUserIds.has(swapper.id) ? 'Online' : 'Offline'}
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5 sm:gap-3">
                 {!isNewMatch && !isAdminChat && (
                   <>
-                    <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => globalStartCall(swapper, 'voice')} className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl border border-white/10 flex items-center justify-center text-gray-300 hover:bg-white/10 transition-all">
-                      <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => globalStartCall(swapper, 'voice')} className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl border border-white/10 flex items-center justify-center text-gray-300 hover:bg-white/10 transition-all">
+                      <Phone className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
                     </motion.button>
-                    <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => globalStartCall(swapper, 'video')} className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl border border-white/10 flex items-center justify-center text-gray-300 hover:bg-white/10 transition-all">
-                      <Video className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => globalStartCall(swapper, 'video')} className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl border border-white/10 flex items-center justify-center text-gray-300 hover:bg-white/10 transition-all">
+                      <Video className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
                     </motion.button>
-                    <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => globalStartCall(swapper, 'screen')} className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl border border-white/10 flex items-center justify-center text-gray-300 hover:bg-white/10 transition-all">
-                      <Monitor className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => globalStartCall(swapper, 'screen')} className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl border border-white/10 flex items-center justify-center text-gray-300 hover:bg-white/10 transition-all">
+                      <Monitor className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
                     </motion.button>
                     <motion.button 
                       whileHover={{ scale: 1.1, backgroundColor: 'rgba(220, 38, 38, 0.1)' }} 
                       whileTap={{ scale: 0.9 }} 
                       onClick={() => setShowConfirmDelete(true)} 
-                      className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl border border-red-500/20 flex items-center justify-center text-red-500 hover:bg-red-500/20 transition-all"
+                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl border border-red-500/20 flex items-center justify-center text-red-500 hover:bg-red-500/20 transition-all"
                       title="Clear Conversation"
                     >
-                      <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <Trash2 className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
                     </motion.button>
                   </>
                 )}
@@ -1036,14 +1036,14 @@ export function Chat() {
               )}
             </AnimatePresence>
 
-            <div className="p-4 border-t border-white/10 bg-black/40 shrink-0">
+            <div className="p-3 sm:p-4 border-t border-white/10 bg-black/40 shrink-0">
               <input
                 type="file"
                 ref={fileInputRef}
                 onChange={handleFileUpload}
                 className="hidden"
               />
-              <form onSubmit={handleSend} className="flex items-center gap-3 relative">
+              <form onSubmit={handleSend} className="flex items-center gap-2 sm:gap-3 relative">
                 {isRecordingVoice ? (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
@@ -1086,9 +1086,9 @@ export function Chat() {
                       whileTap={{ scale: 0.9 }}
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="w-10 h-10 rounded-xl hover:bg-white/10 flex items-center justify-center text-gray-400"
+                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl hover:bg-white/10 flex items-center justify-center text-gray-400"
                     >
-                      <Paperclip className="w-5 h-5" />
+                      <Paperclip className="w-4 h-4 sm:w-5 sm:h-5" />
                     </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.1 }}
@@ -1096,26 +1096,26 @@ export function Chat() {
                       type="button"
                       onClick={handleFetchAiSuggestions}
                       disabled={isAiLoading || messages.length === 0}
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                      className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center transition-all ${
                         isAiLoading ? 'animate-pulse text-purple-500' : 'text-purple-400 hover:bg-purple-500/10'
                       }`}
                       title="AI Smart Replies"
                     >
-                      {isAiLoading ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
+                      {isAiLoading ? <RefreshCw className="w-4 h-4 sm:w-5 h-5 animate-spin" /> : <Sparkles className="w-4 h-4 sm:w-5 h-5" />}
                     </motion.button>
                     <input
                       type="text"
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
-                      placeholder="Type your message..."
-                      className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-purple-500/50 transition-all"
+                      placeholder="Type a message..."
+                      className="flex-1 bg-white/5 border border-white/10 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 text-sm text-white focus:outline-none focus:border-purple-500/50 transition-all"
                     />
                     {newMessage.trim() ? (
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         type="submit"
-                        className="gradient-btn px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-white font-semibold shadow-lg transition-all flex items-center gap-2"
+                        className="gradient-btn px-3 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl text-white font-semibold shadow-lg transition-all flex items-center gap-2"
                       >
                         <span className="hidden sm:inline">Send</span>
                         <Send className="w-4 h-4" />
@@ -1126,9 +1126,9 @@ export function Chat() {
                         whileTap={{ scale: 0.9 }}
                         type="button"
                         onClick={startRecording}
-                        className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-purple-400 hover:bg-white/10 transition-all"
+                        className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-purple-400 hover:bg-white/10 transition-all"
                       >
-                        <Mic className="w-5 h-5" />
+                        <Mic className="w-4 h-4 sm:w-5 h-5" />
                       </motion.button>
                     )}
                   </>
