@@ -21,7 +21,8 @@ import {
   Code2,
   Palette,
   BarChart,
-  Music
+  Music,
+  RefreshCw
 } from 'lucide-react';
 
 const AvatarIcon = ({ name, className = "w-6 h-6" }: { name: string; className?: string }) => {
@@ -55,6 +56,8 @@ export function VideoCall({ swapper, onClose, onToggleScreen, isIncoming = false
 
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [callAccepted, setCallAccepted] = useState(false);
+  
+  const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
   
   const myVideo = useRef<HTMLVideoElement | null>(null);
   const userVideo = useRef<HTMLVideoElement | null>(null);
@@ -345,6 +348,44 @@ export function VideoCall({ swapper, onClose, onToggleScreen, isIncoming = false
     onClose(isConnected ? formatTime(seconds) : undefined);
   };
 
+  const switchCamera = async () => {
+    const newMode = facingMode === 'user' ? 'environment' : 'user';
+    setFacingMode(newMode);
+
+    if (stream) {
+      // Stop old video track
+      const oldVideoTrack = stream.getVideoTracks()[0];
+      if (oldVideoTrack) oldVideoTrack.stop();
+
+      try {
+        const newStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: newMode, width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: true
+        });
+
+        const newVideoTrack = newStream.getVideoTracks()[0];
+        
+        // Replace track in peer connection (simple-peer internal access)
+        if (connectionRef.current && (connectionRef.current as any)._pc) {
+          const pc = (connectionRef.current as any)._pc as RTCPeerConnection;
+          const sender = pc.getSenders().find((s: any) => s.track?.kind === 'video');
+          if (sender) {
+            sender.replaceTrack(newVideoTrack);
+          }
+        }
+
+        // Update local stream state
+        const updatedStream = new MediaStream([newVideoTrack, stream.getAudioTracks()[0]]);
+        setStream(updatedStream);
+        if (myVideo.current) myVideo.current.srcObject = updatedStream;
+        
+      } catch (err) {
+        console.error("Switch camera failed:", err);
+        showToast("Could not switch camera", "error");
+      }
+    }
+  };
+
   return (
     <div className={`absolute inset-0 bg-black z-50 flex flex-col fade-in-1 overflow-hidden transition-all duration-500 ${isMinimized ? 'opacity-0 pointer-events-none translate-y-10' : 'opacity-100'}`}>
       {/* Remote Video Feed */}
@@ -353,7 +394,7 @@ export function VideoCall({ swapper, onClose, onToggleScreen, isIncoming = false
           playsInline
           ref={userVideo}
           autoPlay
-          className={`w-full h-full object-cover transition-all duration-1000 ${isConnected ? 'opacity-100' : 'opacity-0 scale-110 blur-xl'}`}
+          className={`w-full h-full object-cover transition-all duration-1000 scale-x-[-1] ${isConnected ? 'opacity-100' : 'opacity-0 scale-110 blur-xl'}`}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/60" />
       </div>
@@ -388,7 +429,7 @@ export function VideoCall({ swapper, onClose, onToggleScreen, isIncoming = false
         )}
 
         <div className={`absolute bottom-32 right-12 w-48 h-32 bg-gray-900 rounded-2xl border border-white/20 shadow-2xl overflow-hidden transition-all duration-500 z-30 ${stream ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <video playsInline muted ref={myVideo} autoPlay className="w-full h-full object-cover" />
+          <video playsInline muted ref={myVideo} autoPlay className={`w-full h-full object-cover ${facingMode === 'user' ? 'scale-x-[-1]' : ''}`} />
         </div>
       </div>
 
@@ -448,6 +489,15 @@ export function VideoCall({ swapper, onClose, onToggleScreen, isIncoming = false
                 <Monitor size={20} />
               </motion.button>
             )}
+
+            <motion.button 
+              whileHover={{ scale: 1.1, y: -5 }} whileTap={{ scale: 0.9 }}
+              onClick={switchCamera}
+              className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center text-gray-300 hover:bg-white/20 transition-all"
+              title="Switch Camera"
+            >
+              <RefreshCw size={20} className={facingMode === 'environment' ? 'rotate-180' : ''} />
+            </motion.button>
   
             <motion.button 
               whileHover={{ scale: 1.1, y: -5 }} whileTap={{ scale: 0.9 }}

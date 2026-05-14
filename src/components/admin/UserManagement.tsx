@@ -1,18 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, ShieldBan, Trash2, AlertTriangle, CheckCircle2, RotateCcw, Clock, ChevronRight, ChevronDown } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Swapper } from '../../types';
 import { useSwappers } from '../../hooks/useSwappers';
+import { useToast } from '../../context/ToastContext';
 
 export function UserManagement() {
-  const { swappers: users, loading, updateSwapperStatus } = useSwappers();
+  const { swappers: users, loading, updateSwapperStatus, permanentlyDeleteUser } = useSwappers();
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const initialTab = queryParams.get('tab') || 'all';
   const [activeTab, setActiveTab] = useState(initialTab);
   const [showScrollHint, setShowScrollHint] = useState(true);
+  const [confirmModal, setConfirmModal] = useState<{ show: boolean, userId: string | null, action: 'permanent_delete' | 'delete' | 'suspend' | null }>({ show: false, userId: null, action: null });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,13 +32,24 @@ export function UserManagement() {
     if (tab) setActiveTab(tab);
   }, [location.search]);
 
-  const handleAction = async (userId: string, action: 'suspend' | 'delete' | 'restore') => {
+  const handleAction = async (userId: string, action: 'suspend' | 'delete' | 'restore' | 'permanent_delete') => {
+    if (action === 'permanent_delete') {
+      console.log('Admin: Requesting permanent delete for user:', userId);
+      setConfirmModal({ show: true, userId: userId, action: 'permanent_delete' });
+      return;
+    }
+    
     let newStatus: 'active' | 'suspended' | 'deleted' = 'active';
     if (action === 'suspend') newStatus = 'suspended';
     else if (action === 'delete') newStatus = 'deleted';
     else if (action === 'restore') newStatus = 'active';
-
-    await updateSwapperStatus(userId, newStatus);
+    
+    try {
+      await updateSwapperStatus(userId, newStatus);
+      showToast(`User status updated to ${newStatus}`, 'success');
+    } catch (err) {
+      showToast('Failed to update user status', 'error');
+    }
   };
 
   const filteredUsers = users.filter(user => {
@@ -65,7 +80,7 @@ export function UserManagement() {
   });
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+    <div className="p-3 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full overflow-x-hidden">
       {/* Header & Actions */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
         <div>
@@ -80,7 +95,7 @@ export function UserManagement() {
       </div>
 
       {/* Filters & Search */}
-      <div className="bg-[#12121a] border border-white/5 rounded-3xl p-5 flex flex-col items-stretch gap-4 mb-8">
+      <div className="bg-[#12121a] border border-white/5 rounded-2xl sm:rounded-3xl p-4 sm:p-5 flex flex-col items-stretch gap-4 mb-8">
         <div className="relative">
           <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 hide-scrollbar">
           {[
@@ -142,7 +157,7 @@ export function UserManagement() {
           filteredUsers.map((user, index) => (
             <div
               key={user.id}
-              className={`bg-white/5 p-6 flex flex-col h-full border rounded-3xl transition-all hover:-translate-y-1 ${user.status === 'suspended' ? 'border-amber-500/30' :
+              className={`bg-white/5 p-4 sm:p-6 flex flex-col h-full border rounded-2xl sm:rounded-3xl transition-all hover:-translate-y-1 ${user.status === 'suspended' ? 'border-amber-500/30' :
                 user.status === 'deleted' ? 'border-red-500/30' :
                   'border-white/10 hover:border-purple-500/30'
                 }`}
@@ -286,11 +301,22 @@ export function UserManagement() {
                     </button>
                   </>
                 ) : (
-                  // Permanently deleted — cannot restore (hard deleted from DB)
-                  <div className="col-span-2 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-red-500/5 border border-red-500/10 text-red-500/50 text-xs font-bold cursor-not-allowed">
-                    <Trash2 size={14} />
-                    Permanently Deleted — Cannot Restore
-                  </div>
+                  <>
+                    <button
+                      onClick={() => handleAction(user.id, 'restore')}
+                      className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 text-xs font-bold transition-all border border-emerald-500/20"
+                    >
+                      <RotateCcw size={14} />
+                      Restore User
+                    </button>
+                    <button
+                      onClick={() => handleAction(user.id, 'permanent_delete')}
+                      className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-red-600 text-white text-xs font-bold transition-all border border-red-500/20 shadow-lg shadow-red-900/20"
+                    >
+                      <Trash2 size={14} />
+                      Hard Delete
+                    </button>
+                  </>
                 )}
                 <button
                   onClick={() => navigate(`/profile/${user.id}`)}
@@ -319,6 +345,55 @@ export function UserManagement() {
           <button className="px-3 py-1.5 rounded-md border border-white/10 text-xs font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all">Next</button>
         </div>
       </div>
+      {/* Custom Confirmation Modal */}
+      {confirmModal.show && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 backdrop-blur-md bg-black/60">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="w-full max-w-md bg-[#11111a] border border-white/10 rounded-[2.5rem] p-8 sm:p-10 shadow-3xl text-center relative overflow-hidden"
+          >
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-orange-500" />
+            
+            <div className="w-20 h-20 bg-red-500/10 border border-red-500/20 rounded-3xl flex items-center justify-center mx-auto mb-6">
+              <ShieldBan size={40} className="text-red-500" />
+            </div>
+
+            <h3 className="text-2xl font-black text-white mb-3 tracking-tight">Security Alert</h3>
+            <p className="text-gray-400 text-sm mb-8 leading-relaxed">
+              Are you sure you want to <span className="text-red-400 font-bold">PERMANENTLY</span> delete this user from the database? 
+              <br/><br/>
+              This action is <span className="text-white font-black underline decoration-red-500">irreversible</span> and will erase all profile data, auth credentials, and associated records.
+            </p>
+
+            <div className="grid grid-cols-2 gap-4">
+              <button 
+                onClick={() => setConfirmModal({ show: false, userId: null, action: null })}
+                className="py-4 bg-white/5 border border-white/10 rounded-2xl text-gray-400 font-bold hover:bg-white/10 hover:text-white transition-all text-sm"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={async () => {
+                  if (confirmModal.userId && confirmModal.action === 'permanent_delete') {
+                    console.log('Admin: Executing Hard Delete for:', confirmModal.userId);
+                    const res = await permanentlyDeleteUser(confirmModal.userId);
+                    if (res.success) {
+                      showToast('User permanently deleted', 'success');
+                    } else {
+                      showToast(res.error || 'Failed to delete user', 'error');
+                    }
+                  }
+                  setConfirmModal({ show: false, userId: null, action: null });
+                }}
+                className="py-4 bg-red-600 rounded-2xl text-white font-black shadow-lg shadow-red-900/40 hover:bg-red-500 transition-all text-sm"
+              >
+                Hard Delete
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

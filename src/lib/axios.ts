@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// Get API URL from environment variables
-const baseURL = process.env.REACT_APP_API_URL!;
+// Get API URL from environment variables with fallback for local testing
+const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 // Create a secure axios instance
 const api = axios.create({

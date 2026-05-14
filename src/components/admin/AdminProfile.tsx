@@ -188,15 +188,15 @@ export function AdminProfile() {
   }
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-3xl mx-auto">
+    <div className="p-3 sm:p-6 lg:p-8 max-w-3xl mx-auto w-full overflow-x-hidden">
       {/* Main Profile Card */}
-      <div className="bg-[#111122] border border-white/10 rounded-[2.5rem] sm:rounded-[3.5rem] overflow-hidden shadow-2xl relative group transition-all duration-500">
+      <div className="bg-[#111122] border border-white/10 rounded-[2rem] sm:rounded-[3.5rem] overflow-hidden shadow-2xl relative group transition-all duration-500">
         <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-purple-600/20 to-transparent" />
         
         <div className="relative z-10 p-6 sm:p-10 flex flex-col items-center">
           
           {/* Top Actions Bar (Inside Card) */}
-          <div className="absolute top-4 right-4 sm:top-6 sm:right-8 flex gap-2">
+          <div className="absolute top-3 right-3 sm:top-6 sm:right-8 flex gap-2">
             {isEditing ? (
               <>
                 <button onClick={() => setIsEditing(false)} className="p-2 sm:p-3 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl text-gray-400 hover:text-white transition-all">
@@ -285,7 +285,7 @@ export function AdminProfile() {
               <>
                 <div className="space-y-1.5">
                   <h2 className="text-4xl sm:text-5xl font-black text-white tracking-tighter drop-shadow-2xl">{adminData.name}</h2>
-                  <div className="flex items-center justify-center gap-2.5 text-purple-400 text-[10px] sm:text-[11px] font-black uppercase tracking-[0.4em]">
+                  <div className="flex items-center justify-center gap-2.5 text-purple-400 text-[9px] sm:text-[11px] font-black uppercase tracking-[0.3em] sm:tracking-[0.4em]">
                     <ShieldCheck size={14} className="animate-pulse" />
                     Root Administrator
                   </div>

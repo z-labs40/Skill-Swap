@@ -122,7 +122,7 @@ export function Support() {
   }
 
   return (
-    <div className="flex-1 flex flex-col p-4 sm:p-6 lg:p-8 bg-[#050505] overflow-hidden lg:h-full lg:max-h-[calc(100vh-100px)]">
+    <div className="flex-1 flex flex-col p-3 sm:p-6 lg:p-8 bg-[#050505] overflow-hidden h-[calc(100dvh-64px)] sm:h-full lg:max-h-[calc(100vh-100px)]">
       <style>{`
         .custom-scrollbar::-webkit-scrollbar {
           display: none !important;
@@ -198,20 +198,20 @@ export function Support() {
           {selectedEmail ? (
             <>
               {/* Chat Header */}
-              <div className="p-4 sm:p-6 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
-                <div className="flex items-center gap-3 sm:gap-4 overflow-hidden">
+              <div className="p-3 sm:p-6 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
+                <div className="flex items-center gap-2 sm:gap-4 overflow-hidden">
                   <button 
                     onClick={() => setShowChatOnMobile(false)}
-                    className="p-2 -ml-2 rounded-xl hover:bg-white/5 text-gray-400 lg:hidden"
+                    className="p-1.5 -ml-1 rounded-xl hover:bg-white/5 text-gray-400 lg:hidden"
                   >
-                    <ArrowLeft size={20} />
+                    <ArrowLeft size={18} />
                   </button>
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-white/10 flex items-center justify-center text-purple-400">
-                    <User size={20} />
+                  <div className="w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-white/10 flex items-center justify-center text-purple-400">
+                    <User size={18} />
                   </div>
                   <div className="overflow-hidden">
-                    <h3 className="font-black text-white text-sm sm:text-base truncate">{selectedEmail}</h3>
-                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Live Support Session</p>
+                    <h3 className="font-black text-white text-xs sm:text-base truncate">{selectedEmail}</h3>
+                    <p className="text-[8px] sm:text-[10px] text-gray-500 font-bold uppercase tracking-widest">Live Session</p>
                   </div>
                 </div>
               </div>
@@ -316,20 +316,20 @@ export function Support() {
               </div>
 
               {/* Input Area */}
-              <div className="p-4 sm:p-6 border-t border-white/5 bg-white/[0.02]">
-                <form onSubmit={handleSendReply} className="relative flex items-center gap-3">
+              <div className="p-3 sm:p-6 border-t border-white/5 bg-white/[0.02]">
+                <form onSubmit={handleSendReply} className="relative flex items-center gap-2 sm:gap-3">
                   <input 
                     type="text"
                     placeholder="Type your reply here..."
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
-                    className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm focus:outline-none focus:border-purple-500/50 transition-all placeholder:text-gray-600"
+                    className="flex-1 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl px-4 sm:px-5 py-3 sm:py-4 text-white text-xs sm:text-sm focus:outline-none focus:border-purple-500/50 transition-all placeholder:text-gray-600"
                   />
                   <button 
                     type="submit"
-                    className="p-4 bg-purple-600 hover:bg-purple-500 text-white rounded-2xl transition-all shadow-lg shadow-purple-900/20 flex-shrink-0"
+                    className="p-3 sm:p-4 bg-purple-600 hover:bg-purple-500 text-white rounded-xl sm:rounded-2xl transition-all shadow-lg shadow-purple-900/20 flex-shrink-0"
                   >
-                    <Send size={18} />
+                    <Send size={16} />
                   </button>
                 </form>
               </div>

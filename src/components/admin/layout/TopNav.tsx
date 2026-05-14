@@ -20,7 +20,7 @@ export function TopNav({ activeTab, onMenuClick }: TopNavProps) {
   const navigate = useNavigate();
 
   return (
-    <header className="h-20 border-b border-white/5 flex items-center justify-between px-4 sm:px-8 bg-black/20 backdrop-blur-md sticky top-0 z-20">
+    <header className="h-16 sm:h-20 border-b border-white/5 flex items-center justify-between px-4 sm:px-8 bg-black/20 backdrop-blur-md sticky top-0 z-20">
       <div className="flex items-center gap-3">
         <button 
           onClick={onMenuClick}

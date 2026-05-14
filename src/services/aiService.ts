@@ -6,8 +6,8 @@ export const aiService = {
     return response.data.data;
   },
 
-  getAiAssistance: async (topic: string, context: string) => {
-    const response = await api.post('/ai/assistance', { topic, context });
+  getAiAssistance: async (message: string, history: any[]) => {
+    const response = await api.post('/ai/chat', { message, history });
     return response.data.data;
   }
 };

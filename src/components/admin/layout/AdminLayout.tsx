@@ -38,7 +38,7 @@ export default function AdminLayout() {
   const activeTab = getActiveTab();
 
   return (
-    <div className="min-h-screen bg-[#0a0a0b] text-gray-300 flex overflow-x-hidden">
+    <div className="min-h-screen bg-[#0a0a0b] text-gray-300 flex overflow-x-hidden w-full">
       {/* Sidebar Overlay for Mobile */}
       <AnimatePresence>
         {sidebarOpen && (

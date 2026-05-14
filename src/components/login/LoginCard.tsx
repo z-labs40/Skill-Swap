@@ -168,7 +168,7 @@ export function LoginCard({ onSuccess, defaultTab = "login" }: LoginCardProps) {
   }
 
   return (
-    <div className="login-card relative w-full max-w-md rounded-3xl p-8 z-10 mx-auto">
+    <div className="login-card relative w-full max-w-md rounded-2xl sm:rounded-3xl p-6 sm:p-8 z-10 mx-auto">
       <div className="text-center mb-6">
         <div className="flex justify-center mb-4">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-500/20 to-blue-500/20 border border-white/10 flex items-center justify-center shadow-xl">
@@ -224,7 +224,7 @@ export function LoginCard({ onSuccess, defaultTab = "login" }: LoginCardProps) {
                   value={otp}
                   onChange={e => setOtp(e.target.value)}
                   maxLength={6}
-                  className="auth-input w-full px-4 py-3 rounded-xl text-sm text-center tracking-[0.5em] font-bold"
+                  className="auth-input w-full px-4 py-3 rounded-xl text-sm text-center tracking-[0.2em] sm:tracking-[0.5em] font-bold"
                   disabled={loading}
                 />
                 <div className="relative group">
@@ -254,8 +254,8 @@ export function LoginCard({ onSuccess, defaultTab = "login" }: LoginCardProps) {
                     disabled={loading}
                   />
                   {confirm && password === confirm && (
-                    <div className="absolute left-[-30px] top-1/2 -translate-y-1/2 text-green-500 animate-in zoom-in duration-300">
-                      <CheckCircle2 size={20} />
+                    <div className="absolute right-12 top-1/2 -translate-y-1/2 text-green-500 animate-in zoom-in duration-300">
+                      <CheckCircle2 size={18} />
                     </div>
                   )}
                   <button
@@ -298,7 +298,7 @@ export function LoginCard({ onSuccess, defaultTab = "login" }: LoginCardProps) {
               value={otp}
               onChange={e => setOtp(e.target.value)}
               maxLength={6}
-              className="auth-input w-full px-4 py-3 rounded-xl text-sm text-center tracking-[0.5em] font-bold"
+              className="auth-input w-full px-4 py-3 rounded-xl text-sm text-center tracking-[0.2em] sm:tracking-[0.5em] font-bold"
               disabled={loading}
             />
             <button
@@ -387,8 +387,8 @@ export function LoginCard({ onSuccess, defaultTab = "login" }: LoginCardProps) {
                     disabled={loading}
                   />
                   {confirm && password === confirm && (
-                    <div className="absolute left-[-30px] top-1/2 -translate-y-1/2 text-green-500 animate-in zoom-in duration-300">
-                      <CheckCircle2 size={20} />
+                    <div className="absolute right-12 top-1/2 -translate-y-1/2 text-green-500 animate-in zoom-in duration-300">
+                      <CheckCircle2 size={18} />
                     </div>
                   )}
                   <button

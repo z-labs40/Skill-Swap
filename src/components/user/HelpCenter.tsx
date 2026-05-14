@@ -108,7 +108,7 @@ export function HelpCenter({ userEmail }: { userEmail: string }) {
               animate={{ opacity: 1, y: 0, scale: 1, rotate: 0 }}
               exit={{ opacity: 0, y: 100, scale: 0.9 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="w-full sm:w-[350px] lg:w-[380px] h-[80vh] sm:h-[70vh] lg:h-[580px] max-h-[85vh] sm:max-h-[580px] bg-[#0d0d15]/95 backdrop-blur-2xl border border-white/10 rounded-[24px] shadow-[0_20px_50px_rgba(0,0,0,0.5)] pointer-events-auto overflow-hidden flex flex-col relative"
+              className="w-[calc(100vw-32px)] sm:w-[350px] lg:w-[380px] h-[75dvh] sm:h-[70vh] lg:h-[580px] max-h-[85vh] sm:max-h-[580px] bg-[#0d0d15]/95 backdrop-blur-2xl border border-white/10 rounded-[24px] shadow-[0_20px_50px_rgba(0,0,0,0.5)] pointer-events-auto overflow-hidden flex flex-col relative"
             >
               {/* Background Glow */}
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-purple-600/20 blur-[100px] -z-10 pointer-events-none" />
@@ -205,13 +205,17 @@ export function HelpCenter({ userEmail }: { userEmail: string }) {
                     className="w-full bg-white/5 border border-white/10 rounded-[20px] py-4 pl-5 pr-14 text-sm text-white focus:outline-none focus:border-purple-500/50 focus:bg-white/[0.08] transition-all placeholder:text-gray-600 shadow-2xl"
                   />
                   <motion.button 
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
+                    whileHover={message.trim() ? { scale: 1.1, x: 2 } : {}}
+                    whileTap={message.trim() ? { scale: 0.9 } : {}}
                     type="submit"
                     disabled={!message.trim()}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-gradient-to-tr from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-purple-500/20 disabled:opacity-30 disabled:grayscale transition-all"
+                    className={`absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                      message.trim() 
+                        ? 'bg-gradient-to-tr from-purple-600 to-indigo-600 text-white shadow-[0_4px_15px_rgba(147,51,234,0.4)] opacity-100' 
+                        : 'bg-white/5 text-white/20 opacity-50 cursor-not-allowed'
+                    }`}
                   >
-                    <Send size={18} />
+                    <Send size={18} className={message.trim() ? 'drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]' : ''} />
                   </motion.button>
                 </form>
                 <p className="text-center text-[9px] text-gray-600 mt-4 font-bold uppercase tracking-[0.2em]">

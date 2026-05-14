@@ -635,7 +635,7 @@ export function Chat() {
   };
 
   return (
-    <div className="h-screen hero-bg flex overflow-hidden fixed inset-0 z-50">
+    <div className="h-[100dvh] hero-bg flex overflow-hidden fixed inset-0 z-50">
 
       {/* Sidebar - Chat List */}
       <div className={`w-full md:w-80 border-r border-white/10 bg-black/40 flex flex-col shrink-0 ${showMobileSidebar ? 'flex' : 'hidden md:flex'}`}>
@@ -712,7 +712,9 @@ export function Chat() {
                       </span>
                     </div>
                     <p className="text-gray-400 text-xs truncate">
-                      {s.lastMessage || "No messages yet"}
+                      {s.lastMessage && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s.lastMessage)
+                        ? s.lastMessage 
+                        : (s.lastMessage && !s.lastMessage.includes('-') ? s.lastMessage : "No messages yet")}
                     </p>
                   </div>
                 </button>
@@ -737,7 +739,7 @@ export function Chat() {
       <div className={`flex-1 flex flex-col relative overflow-hidden bg-black/20 ${!showMobileSidebar ? 'flex' : 'hidden md:flex'}`}>
 
         {/* Chat Header */}
-        <div className="h-16 sm:h-20 border-b border-white/10 bg-white/5 flex items-center px-4 sm:px-6 justify-between shrink-0 z-10">
+        <div className="h-14 sm:h-20 border-b border-white/10 bg-white/5 flex items-center px-3 sm:px-6 justify-between shrink-0 z-10">
           {otherId && swapper ? (
             <>
               <div className="flex items-center gap-2 sm:gap-4 overflow-hidden">
@@ -755,11 +757,11 @@ export function Chat() {
                 >
                   <AvatarIcon name={swapper.name} url={swapper.avatarUrl} className="w-full h-full" />
                 </motion.div>
-                <div className="min-w-0">
-                  <h1 className="text-white font-black text-sm sm:text-base truncate leading-tight">{swapper?.name}</h1>
-                  <div className="flex items-center gap-1.5 mt-0.5">
+                <div className="min-w-0 max-w-[120px] sm:max-w-none">
+                  <h1 className="text-white font-black text-xs sm:text-base truncate leading-tight">{swapper?.name}</h1>
+                  <div className="flex items-center gap-1 mt-0.5">
                     <div className={`w-1.5 h-1.5 rounded-full ${isAdminChat || swapper?.isOnline ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]' : 'bg-gray-500'}`} />
-                    <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">
+                    <span className="text-[9px] sm:text-[10px] text-gray-500 font-bold uppercase tracking-widest truncate">
                       {isAdminChat || swapper?.isOnline ? 'Online' : 'Offline'}
                     </span>
                   </div>
@@ -768,26 +770,26 @@ export function Chat() {
 
               <div className="flex items-center gap-1.5 sm:gap-3">
                 {!isNewMatch && !isAdminChat && (
-                  <>
-                    <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => globalStartCall(swapper, 'voice')} className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl border border-white/10 flex items-center justify-center text-gray-300 hover:bg-white/10 transition-all">
-                      <Phone className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+                  <div className="flex items-center gap-1 sm:gap-3">
+                    <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => globalStartCall(swapper, 'voice')} className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl border border-white/10 flex items-center justify-center text-gray-300 hover:bg-white/10 transition-all">
+                      <Phone className="w-3 h-3 sm:w-5 sm:h-5" />
                     </motion.button>
-                    <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => globalStartCall(swapper, 'video')} className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl border border-white/10 flex items-center justify-center text-gray-300 hover:bg-white/10 transition-all">
-                      <Video className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+                    <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => globalStartCall(swapper, 'video')} className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl border border-white/10 flex items-center justify-center text-gray-300 hover:bg-white/10 transition-all">
+                      <Video className="w-3 h-3 sm:w-5 sm:h-5" />
                     </motion.button>
-                    <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => globalStartCall(swapper, 'screen')} className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl border border-white/10 flex items-center justify-center text-gray-300 hover:bg-white/10 transition-all">
-                      <Monitor className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+                    <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => globalStartCall(swapper, 'screen')} className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl border border-white/10 flex items-center justify-center text-gray-300 hover:bg-white/10 transition-all hidden xs:flex">
+                      <Monitor className="w-3 h-3 sm:w-5 sm:h-5" />
                     </motion.button>
                     <motion.button 
                       whileHover={{ scale: 1.1, backgroundColor: 'rgba(220, 38, 38, 0.1)' }} 
                       whileTap={{ scale: 0.9 }} 
                       onClick={() => setShowConfirmDelete(true)} 
-                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl border border-red-500/20 flex items-center justify-center text-red-500 hover:bg-red-500/20 transition-all"
+                      className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl border border-red-500/20 flex items-center justify-center text-red-500 hover:bg-red-500/20 transition-all"
                       title="Clear Conversation"
                     >
-                      <Trash2 className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+                      <Trash2 className="w-3 h-3 sm:w-5 sm:h-5" />
                     </motion.button>
-                  </>
+                  </div>
                 )}
                 {!isAdminChat && (
                   <button
@@ -1007,7 +1009,7 @@ export function Chat() {
                             <>
                               {msg.text}
                               {msg.isEdited && <span className="text-[10px] opacity-50 ml-2">(edited)</span>}
-                              {msg.sender === 'me' && (
+                              {(msg.sender === 'me' || (isAdminChat && msg.id.toString().startsWith('ai_'))) && (
                                 <div className="absolute top-1/2 -translate-y-1/2 -left-8 opacity-0 group-hover:opacity-100 transition-opacity flex items-center">
                                   <button 
                                     onClick={() => setActiveMenuId(activeMenuId === msg.id ? null : msg.id)}
@@ -1017,21 +1019,23 @@ export function Chat() {
                                   </button>
                                   {activeMenuId === msg.id && (
                                     <div className="absolute bottom-full mb-2 left-0 bg-[#1a1a24] border border-white/10 rounded-xl py-2 shadow-2xl z-50 min-w-[100px] overflow-hidden">
-                                      <button 
-                                        onClick={() => {
-                                          setEditingMessageId(msg.id);
-                                          setEditValue(msg.text);
-                                          setActiveMenuId(null);
-                                        }}
-                                        className="w-full px-4 py-2 text-left text-xs text-gray-300 hover:bg-white/5 flex items-center gap-2"
-                                      >
-                                        <Edit2 size={12} /> Edit
-                                      </button>
+                                      {msg.sender === 'me' && (
+                                        <button 
+                                          onClick={() => {
+                                            setEditingMessageId(msg.id);
+                                            setEditValue(msg.text);
+                                            setActiveMenuId(null);
+                                          }}
+                                          className="w-full px-4 py-2 text-left text-xs text-gray-300 hover:bg-white/5 flex items-center gap-2"
+                                        >
+                                          <Edit2 size={12} /> Edit
+                                        </button>
+                                      )}
                                       <button 
                                         onClick={() => handleUnsend(msg.id)}
                                         className="w-full px-4 py-2 text-left text-xs text-red-400 hover:bg-red-500/10 flex items-center gap-2"
                                       >
-                                        <Trash2 size={12} /> Unsend
+                                        <Trash2 size={12} /> {isAdminChat && msg.id.toString().startsWith('ai_') ? 'Delete AI Reply' : 'Unsend'}
                                       </button>
                                     </div>
                                   )}
@@ -1134,9 +1138,9 @@ export function Chat() {
                       whileTap={{ scale: 0.9 }}
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl hover:bg-white/10 flex items-center justify-center text-gray-400"
+                      className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl hover:bg-white/10 flex items-center justify-center text-gray-400"
                     >
-                      <Paperclip className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <Paperclip className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
                     </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.1 }}
@@ -1144,12 +1148,12 @@ export function Chat() {
                       type="button"
                       onClick={handleFetchAiSuggestions}
                       disabled={isAiLoading || messages.length === 0}
-                      className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center transition-all ${
+                      className={`w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center transition-all ${
                         isAiLoading ? 'animate-pulse text-purple-500' : 'text-purple-400 hover:bg-purple-500/10'
                       }`}
                       title="AI Smart Replies"
                     >
-                      {isAiLoading ? <RefreshCw className="w-4 h-4 sm:w-5 h-5 animate-spin" /> : <Sparkles className="w-4 h-4 sm:w-5 h-5" />}
+                      {isAiLoading ? <RefreshCw className="w-3.5 h-3.5 sm:w-5 h-5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5 sm:w-5 h-5" />}
                     </motion.button>
                     <input
                       type="text"
@@ -1174,9 +1178,9 @@ export function Chat() {
                         whileTap={{ scale: 0.9 }}
                         type="button"
                         onClick={startRecording}
-                        className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-purple-400 hover:bg-white/10 transition-all"
+                        className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-purple-400 hover:bg-white/10 transition-all"
                       >
-                        <Mic className="w-4 h-4 sm:w-5 h-5" />
+                        <Mic className="w-3.5 h-3.5 sm:w-5 h-5" />
                       </motion.button>
                     )}
                   </>

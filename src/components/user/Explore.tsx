@@ -6,11 +6,13 @@ import { SecureImage } from '../common/SecureImage';
 import { chatService } from '../../services/chatService';
 import { userService } from '../../services/userService';
 import { useToast } from '../../context/ToastContext';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export function Explore() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sentRequestsLocal, setSentRequestsLocal] = useState<Record<string, boolean>>({});
   const [requestLoading, setRequestLoading] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const { role } = getAuthState();
   const { showToast } = useToast();
@@ -32,37 +34,71 @@ export function Explore() {
 
   return (
     <div className="min-h-screen hero-bg grid-overlay text-white">
-      {/* Dashboard Navbar */}
+      {/* Mobile Floating Menu */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileMenuOpen(false)}
+              className="fixed inset-0 z-[60] sm:hidden bg-black/40 backdrop-blur-sm"
+            />
+            <div className="fixed top-[68px] right-4 z-[70] flex flex-col gap-2.5 sm:hidden">
+              {[
+                { label: 'Dashboard', icon: '📊', action: () => { setMobileMenuOpen(false); navigate('/user/dashboard'); }, color: 'border-purple-500/40 bg-purple-950/80 text-purple-200' },
+                { label: 'Messages',  icon: '💬', action: () => { setMobileMenuOpen(false); navigate('/user/messages'); }, color: 'border-blue-500/40 bg-blue-950/80 text-blue-200' },
+                { label: 'My Profile', icon: '👤', action: () => { setMobileMenuOpen(false); navigate('/user/my-profile'); }, color: 'border-emerald-500/40 bg-emerald-950/80 text-emerald-200' },
+              ].map((item, i) => (
+                <motion.button
+                  key={item.label}
+                  initial={{ opacity: 0, y: -10, x: 20 }}
+                  animate={{ opacity: 1, y: 0, x: 0 }}
+                  exit={{ opacity: 0, y: -8, x: 16 }}
+                  transition={{ delay: i * 0.05 }}
+                  onClick={item.action}
+                  className={`flex items-center gap-3 px-5 py-3 rounded-2xl border text-sm font-semibold backdrop-blur-xl transition-all shadow-xl ${item.color}`}
+                  style={{ minWidth: '152px' }}
+                >
+                  <span>{item.icon}</span>
+                  {item.label}
+                </motion.button>
+              ))}
+            </div>
+          </>
+        )}
+      </AnimatePresence>
+
       <nav className="navbar h-16 flex items-center justify-between px-6 sticky top-0 z-50">
         <div className="flex items-center cursor-pointer" onClick={() => navigate('/dashboard')}>
-          <img
-            src="/logo.png"
-            alt="SkillBridge Logo"
-            className="h-12 w-auto object-contain logo-blend"
-          />
+          <img src="/logo.png" alt="SkillBridge Logo" className="h-10 sm:h-12 w-auto object-contain logo-blend" />
+          <span className="sm:hidden text-white font-black text-sm tracking-wide ml-2">SkillBridge</span>
         </div>
-        <div className="flex items-center space-x-3">
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="px-5 py-2 text-sm font-medium text-gray-300 border border-white/10 rounded-xl hover:bg-white/10 transition-all"
-          >
-            Dashboard
-          </button>
-          <button
-            onClick={() => navigate('/messages')}
-            className="px-5 py-2 text-sm font-medium text-gray-300 border border-white/10 rounded-xl hover:bg-white/10 transition-all"
-          >
-            Messages
-          </button>
+        
+        {/* Desktop Nav */}
+        <div className="hidden sm:flex items-center space-x-3">
+          <button onClick={() => navigate('/user/dashboard')} className="px-5 py-2 text-sm font-medium text-gray-300 border border-white/10 rounded-xl hover:bg-white/10 transition-all">Dashboard</button>
+          <button onClick={() => navigate('/user/messages')} className="px-5 py-2 text-sm font-medium text-gray-300 border border-white/10 rounded-xl hover:bg-white/10 transition-all">Messages</button>
         </div>
+
+        {/* Mobile Hamburger */}
+        <button
+          onClick={() => setMobileMenuOpen(true)}
+          className="sm:hidden flex flex-col gap-1.5 p-2 rounded-lg bg-white/5 border border-white/10"
+        >
+          <span className="block w-5 h-0.5 bg-white rounded"></span>
+          <span className="block w-5 h-0.5 bg-white rounded"></span>
+          <span className="block w-5 h-0.5 bg-white rounded"></span>
+        </button>
       </nav>
 
       <div className="pt-12 pb-12 px-6 max-w-7xl mx-auto">
 
         {/* Header & Search */}
-        <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-12 fade-in-1">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-12 fade-in-1">
           <div>
-            <h1 className="text-4xl font-black mb-2">Explore <span className="gradient-text">Swappers</span></h1>
+            <h1 className="text-3xl sm:text-4xl font-black mb-2">Explore <span className="gradient-text">Swappers</span></h1>
             <p className="text-gray-400">Find the perfect match for your skill exchange journey.</p>
           </div>
 

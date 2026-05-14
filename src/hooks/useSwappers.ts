@@ -85,7 +85,18 @@ export function useSwappers() {
     }
   };
 
-  return { swappers, loading, error, reload: loadSwappers, updateSwapperStatus };
+  const permanentlyDeleteUser = async (id: string) => {
+    try {
+      await adminService.deleteUser(id);
+      setSwappers(prev => prev.filter(s => s.id !== id));
+      return { success: true };
+    } catch (err: any) {
+      console.error('Failed to permanently delete user:', err);
+      return { success: false, error: err.message };
+    }
+  };
+
+  return { swappers, loading, error, reload: loadSwappers, updateSwapperStatus, permanentlyDeleteUser };
 }
 
 

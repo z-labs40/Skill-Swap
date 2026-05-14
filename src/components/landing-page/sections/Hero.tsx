@@ -112,13 +112,13 @@ export function Hero({ onGetStarted, isAdmin }: HeroProps) {
                 </div>
               ) : (
                 <h1 className="fade-in-2 text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-tight mb-6 tracking-tight">
-                  {content.heroTitle.includes("Skills.") ? (
+                  {content?.heroTitle?.includes("Skills.") ? (
                     <>
                       {content.heroTitle.split("Skills.")[0]}
                       <span className="gradient-text">Skills.</span>
                       {content.heroTitle.split("Skills.")[1]}
                     </>
-                  ) : content.heroTitle}
+                  ) : (content?.heroTitle || "Exchange Skills. Learn Anything.")}
                 </h1>
               )}
             </div>
