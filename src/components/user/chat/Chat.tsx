@@ -544,7 +544,7 @@ export function Chat() {
         await sendSupportMessage(userEmail, newMessage);
         setNewMessage("");
         // Optimistically reload messages
-        setTimeout(loadAdminMessages, 500); 
+        setTimeout(loadAdminMessages, 3000); 
       } catch (error) {
         console.error('Failed to send support message:', error);
         showToast("Failed to send message", "error");
